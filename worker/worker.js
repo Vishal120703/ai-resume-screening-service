@@ -1,5 +1,6 @@
 import Queue from "bull";
 import dotenv from "dotenv";
+import { evaluateResume } from "./services/llmService.js";
 
 dotenv.config();
 
@@ -16,14 +17,23 @@ resumeQueue.process(async (job) => {
 
   try {
     console.log(`Processing job: ${evaluation_id}`);
-    console.log(`File: ${filePath}`);
 
-    // Simulate processing 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // dummy resume text
+    const resumeText = "Node.js developer with Express experience";
+    const jobDescription = "Looking for Node.js developer with MongoDB";
 
-    console.log(`Completed job: ${evaluation_id}`);
+    const result = await evaluateResume(resumeText, jobDescription);
 
-    return { success: true };
+    console.log("LLM Raw Output:", result);
+
+    const parsed = JSON.parse(result);
+
+    console.log("Parsed Result:", parsed);
+
+    console.log(` Completed job: ${evaluation_id}`);
+
+    return parsed;
+
   } catch (error) {
     console.error(`Failed job: ${evaluation_id}`, error);
     throw error; 
