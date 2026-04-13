@@ -10,6 +10,19 @@ export const uploadResume = async (req, res) => {
       evaluation_id,
       filePath,
     });
+    await resumeQueue.add(
+  {
+    evaluation_id,
+    filePath,
+  },
+  {
+    attempts: 3,
+    backoff: {
+      type: "exponential",
+      delay: 2000,
+    },
+  }
+);
 
 
     return res.status(202).json({
