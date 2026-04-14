@@ -4,7 +4,9 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import { connectDB } from "./config/db.js";
 import resultRoutes from "./routes/resultRoutes.js";
 
-dotenv.config();
+dotenv.config({
+  path: process.env.NODE_ENV === "test" ? ".env.test" : ".env",
+});
 connectDB();
 
 const app = express();
@@ -14,7 +16,11 @@ app.use(express.json());
 app.use("/upload", uploadRoutes);
 app.use("/result", resultRoutes);
 
-app.listen(port,()=>{
-    console.log(`The Server is Running on Port :${port}`);
-})
+export default app;
+
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
 
