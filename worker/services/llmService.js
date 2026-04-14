@@ -5,7 +5,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const evaluateResume = async (resumeText, jobDescription) => {
   const promptTemplate = fs.readFileSync(
-    "../prompts/evaluation_prompt.txt",
+    "/app/prompts/evaluation_prompt.txt",
     "utf-8"
   );
 

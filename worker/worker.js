@@ -1,8 +1,12 @@
 import Queue from "bull";
 import dotenv from "dotenv";
 import { evaluateResume } from "./services/llmService.js";
+import { connectDB } from "./config/db.js";
+import Evaluation from "./models/Evaluation.js";
 
 dotenv.config();
+connectDB();
+
 
 const resumeQueue = new Queue("resume-processing", {
   redis: {
@@ -17,20 +21,26 @@ resumeQueue.process(async (job) => {
 
   try {
     console.log(`Processing job: ${evaluation_id}`);
-
     // dummy resume text
     const resumeText = "Node.js developer with Express experience";
     const jobDescription = "Looking for Node.js developer with MongoDB";
 
     const result = await evaluateResume(resumeText, jobDescription);
 
-    console.log("LLM Raw Output:", result);
+    // console.log("LLM Raw Output:", result);
 
     const parsed = JSON.parse(result);
 
     console.log("Parsed Result:", parsed);
-
     console.log(` Completed job: ${evaluation_id}`);
+    await Evaluation.findOneAndUpdate(
+      { evaluation_id },
+      {
+        status: "completed",
+        ...parsed,
+      }
+    );
+    console.log(`Completed job: ${evaluation_id}`);
 
     return parsed;
 

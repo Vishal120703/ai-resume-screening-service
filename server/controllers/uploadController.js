@@ -1,15 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
 import resumeQueue from "../queues/resumeQueue.js";
+import Evaluation from "../models/Evaluation.js";
 
 export const uploadResume = async (req, res) => {
   try {
     const evaluation_id = uuidv4();
 
     const filePath = req.file.path;
-    await resumeQueue.add({
+
+    await Evaluation.create({
       evaluation_id,
-      filePath,
+      status: "pending",
     });
+
     await resumeQueue.add(
   {
     evaluation_id,
@@ -23,8 +26,6 @@ export const uploadResume = async (req, res) => {
     },
   }
 );
-
-
     return res.status(202).json({
       evaluation_id,
       status: "queued",
