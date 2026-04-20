@@ -29,18 +29,22 @@ resumeQueue.process(async (job) => {
 
     // console.log("LLM Raw Output:", result);
 
-    const parsed = JSON.parse(result);
+    // const parsed = JSON.parse(result);
+    const parsed = typeof result === "string" ? JSON.parse(result) : result;
 
     console.log("Parsed Result:", parsed);
     console.log(` Completed job: ${evaluation_id}`);
     await Evaluation.findOneAndUpdate(
       { evaluation_id },
+      
       {
         status: "completed",
         ...parsed,
-      }
+      },
+      {new:true,upsert: true}
     );
     console.log(`Completed job: ${evaluation_id}`);
+    console.log("Completed");
 
     return parsed;
 
